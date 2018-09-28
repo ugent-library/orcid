@@ -1,0 +1,270 @@
+package orcid
+
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"golang.org/x/net/context"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/clientcredentials"
+	"io"
+	//"log"
+	"net/http"
+	"net/url"
+	"regexp"
+	"strconv"
+)
+
+const (
+	ContentType = "application/vnd.orcid+json"
+
+	TokenURL        = "https://orcid.org/oauth/token"
+	SandboxTokenURL = "https://sandbox.orcid.org/oauth/token"
+
+	PublicURL        = "https://pub.orcid.org/v2.0"
+	SandboxPublicURL = "https://pub.sandbox.orcid.org/v2.0"
+
+	MemberURL        = "https://api.orcid.org/v2.0"
+	SandboxMemberURL = "https://api.sandbox.orcid.org/v2.0"
+)
+
+// TODO marshalling, String() method
+type Visibility int
+
+const (
+	LIMITED Visibility = iota
+	REGISTERED_ONLY
+	PUBLIC
+	PRIVATE
+)
+
+// TODO marshalling, String() method
+type ExternalIDRelationship int
+
+const (
+	SELF ExternalIDRelationship = iota
+	PART_OF
+)
+
+type Config struct {
+	HTTPClient *http.Client
+
+	ClientID     string
+	ClientSecret string
+	Scopes       []string
+
+	Token string
+
+	Sandbox bool
+}
+
+type Client struct {
+	httpClient *http.Client
+	baseURL    string
+}
+
+type MemberClient struct {
+	*Client
+}
+
+func newClient(baseURL string, cfg Config) *Client {
+	var httpClient *http.Client
+
+	if cfg.HTTPClient != nil {
+		httpClient = cfg.HTTPClient
+	} else if cfg.Token != "" {
+		t := &oauth2.Token{AccessToken: cfg.Token}
+		ts := oauth2.StaticTokenSource(t)
+		httpClient = oauth2.NewClient(context.Background(), ts)
+	} else {
+		var tokenURL string
+		if cfg.Sandbox {
+			tokenURL = SandboxTokenURL
+		} else {
+			tokenURL = TokenURL
+		}
+		oauthCfg := clientcredentials.Config{
+			ClientID:     cfg.ClientID,
+			ClientSecret: cfg.ClientSecret,
+			TokenURL:     tokenURL,
+			Scopes:       cfg.Scopes,
+		}
+
+		httpClient = oauthCfg.Client(context.Background())
+	}
+
+	return &Client{
+		httpClient: httpClient,
+		baseURL:    baseURL,
+	}
+}
+
+func NewClient(cfg Config) *Client {
+	if cfg.Sandbox {
+		return newClient(SandboxPublicURL, cfg)
+	}
+	return newClient(PublicURL, cfg)
+}
+
+func NewMemberClient(cfg Config) *MemberClient {
+	if cfg.Sandbox {
+		return &MemberClient{newClient(SandboxMemberURL, cfg)}
+	}
+	return &MemberClient{newClient(MemberURL, cfg)}
+}
+
+type SearchResults struct {
+	NumFound int `json:"num-found,omitempty"`
+	Result   []struct {
+		OrcidIdentifier URI `json:"orcid-identifier,omitempty"`
+	} `json:result,omitempty"`
+}
+
+func (c *Client) Search(q string) (*SearchResults, *http.Response, error) {
+	params := url.Values{"q": {q}}
+	path := fmt.Sprintf("search?%s", params.Encode())
+	data := new(SearchResults)
+	res, err := c.get(path, data)
+	return data, res, err
+}
+
+//TODO check 200 code
+func (c *Client) get(path string, data interface{}) (*http.Response, error) {
+	req, err := c.newRequest("GET", path, nil)
+	if err != nil {
+		return nil, err
+	}
+	return c.do(req, data)
+}
+
+//TODO check 201 code
+func (c *MemberClient) add(path string, bodyData interface{}) (int, *http.Response, error) {
+	req, err := c.newRequest("POST", path, bodyData)
+	if err != nil {
+		return 0, nil, err
+	}
+	res, err := c.do(req, nil)
+	if err != nil {
+		return 0, res, err
+	}
+	loc, err := res.Location()
+	if err != nil {
+		return 0, res, err
+	}
+	r := regexp.MustCompile("([^/]+)$")
+	match := r.FindString(loc.String())
+	putCode, err := strconv.Atoi(match)
+	return putCode, res, err
+}
+
+//TODO check 200 code
+func (c *MemberClient) update(path string, bodyData, data interface{}) (*http.Response, error) {
+	req, err := c.newRequest("PUT", path, bodyData)
+	if err != nil {
+		return nil, err
+	}
+	res, err := c.do(req, data)
+	if err != nil {
+		return res, err
+	}
+	return res, err
+}
+
+func (c *Client) delete(path string) (bool, *http.Response, error) {
+	var ok bool
+	req, err := c.newRequest("DELETE", path, nil)
+	if err != nil {
+		return ok, nil, err
+	}
+	res, err := c.do(req, nil)
+	if res.Status == "204" {
+		ok = true
+	}
+	return ok, res, err
+}
+
+func (c *Client) newRequest(method, path string, body interface{}) (*http.Request, error) {
+	u := fmt.Sprintf("%s/%s", c.baseURL, path)
+	var buf io.ReadWriter
+	if body != nil {
+		buf = new(bytes.Buffer)
+		err := json.NewEncoder(buf).Encode(body)
+		if err != nil {
+			return nil, err
+		}
+	}
+	req, err := http.NewRequest(method, u, buf)
+	if err != nil {
+		return req, err
+	}
+	if body != nil {
+		req.Header.Set("Content-Type", ContentType)
+	}
+	req.Header.Set("Accept", ContentType)
+
+	return req, nil
+}
+
+func (c *Client) do(req *http.Request, data interface{}) (*http.Response, error) {
+	res, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if data != nil {
+		defer res.Body.Close()
+		err = json.NewDecoder(res.Body).Decode(data)
+	}
+	return res, err
+}
+
+// common types
+type IntValue struct {
+	Value int `json:"value,omitempty"`
+}
+type StringValue struct {
+	Value string `json:"value,omitempty"`
+}
+type URI struct {
+	Host *string `json:"host,omitempty"`
+	Path *string `json:"path,omitempty"`
+	URI  *string `json:"uri,omitempty"`
+}
+type Source struct {
+	ClientID *URI         `json:"source-client-id,omitempty"`
+	Name     *StringValue `json:"source-name,omitempty"`
+	ORCID    URI          `json:"source-orcid,omitempty"`
+}
+
+type ExternalID struct {
+	Relationship *string      `json:"external-id-relationship,omitempty"`
+	Type         *string      `json:"external-id-type,omitempty"`
+	URL          *StringValue `json:"external-id-url,omitempty"`
+	Value        *string      `json:"external-id-value,omitempty"`
+}
+
+type ExternalIDs struct {
+	ExternalID []ExternalID `json:"external-id,omitempty"`
+}
+
+type Name struct {
+	CreatedDate      *IntValue    `json:"created-date,omitempty"`
+	CreditName       *StringValue `json:"credit-name,omitempty"`
+	FamilyName       *StringValue `json:"family-name,omitempty"`
+	GivenNames       *StringValue `json:"given-names,omitempty"`
+	LastModifiedDate *IntValue    `json:"last-modified-date,omitempty"`
+	Path             *string      `json:"path,omitempty"`
+	Source           *Source      `json:"path,omitempty"`
+	Visibility       *string      `json:"visibility,omitempty"`
+}
+
+func Bool(v bool) *bool       { return &v }
+func String(v string) *string { return &v }
+func Int(v int) *int          { return &v }
+
+func putCodeError(p *int) (err error) {
+	if p == nil {
+		err = errors.New("PutCode is required")
+	}
+	return
+}
