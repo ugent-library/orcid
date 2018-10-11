@@ -117,7 +117,7 @@ func NewMemberClient(cfg Config) *MemberClient {
 type SearchResults struct {
 	NumFound int `json:"num-found,omitempty"`
 	Result   []struct {
-		OrcidIdentifier URI `json:"orcid-identifier,omitempty"`
+		OrcidIdentifier Uri `json:"orcid-identifier,omitempty"`
 	} `json:result,omitempty"`
 }
 
@@ -250,16 +250,16 @@ func (s *StringValue) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-type URI struct {
+type Uri struct {
 	Host *string `json:"host,omitempty"`
 	Path *string `json:"path,omitempty"`
-	URI  *string `json:"uri,omitempty"`
+	Uri  *string `json:"uri,omitempty"`
 }
 
 type Source struct {
-	ClientId *URI         `json:"source-client-id,omitempty"`
+	ClientId *Uri         `json:"source-client-id,omitempty"`
 	Name     *StringValue `json:"source-name,omitempty"`
-	Orcid    URI          `json:"source-orcid,omitempty"`
+	Orcid    *Uri         `json:"source-orcid,omitempty"`
 }
 
 type ExternalId struct {
