@@ -13,11 +13,11 @@ type Title struct {
 
 // TODO remaining fields
 type WorkSummary struct {
-	CreatedDate *IntValue `json:"created-date,omitempty"`
+	CreatedDate *StringValue `json:"created-date,omitempty"`
 	// why is this string in the /work/summary api?
 	DisplayIndex     *int         `json:"display-index,string,omitempty"`
-	ExternalIDs      *ExternalIDs `json:"external-ids,omitempty"`
-	LastModifiedDate *IntValue    `json:"last-modified-date,omitempty"`
+	ExternalIds      *ExternalIds `json:"external-ids,omitempty"`
+	LastModifiedDate *StringValue `json:"last-modified-date,omitempty"`
 	Path             *string      `json:"path,omitempty"`
 	PutCode          *int         `json:"put-code,omitempty"`
 	Source           *Source      `json:"source,omitempty"`
@@ -25,15 +25,15 @@ type WorkSummary struct {
 }
 
 type Work struct {
-	ExternalIDs      *ExternalIDs  `json:"external-ids,omitempty"`
-	LastModifiedDate *IntValue     `json:"last-modified-date,omitempty"`
+	ExternalIds      *ExternalIds  `json:"external-ids,omitempty"`
+	LastModifiedDate *StringValue  `json:"last-modified-date,omitempty"`
 	WorkSummary      []WorkSummary `json:"work-summary,omitempty"`
 }
 
 type Works struct {
-	LastModifiedDate *IntValue `json:"last-modified-date,omitempty"`
-	Path             *string   `json:"path,omitempty"`
-	Group            []Work    `json:"group,omitempty"`
+	LastModifiedDate *StringValue `json:"last-modified-date,omitempty"`
+	Path             *string      `json:"path,omitempty"`
+	Group            []Work       `json:"group,omitempty"`
 }
 
 func (c *Client) Works(orcid string) (*Works, *http.Response, error) {

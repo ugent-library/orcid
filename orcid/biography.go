@@ -6,11 +6,11 @@ import (
 )
 
 type Biography struct {
-	Content          *string   `json:"content,omitempty"`
-	CreatedDate      *IntValue `json:"created-date,omitempty"`
-	LastModifiedDate *IntValue `json:"last-modified-date,omitempty"`
-	Path             *string   `json:"path,omitempty"`
-	Visibility       *string   `json:"visibility,omitempty"`
+	Content          *string      `json:"content,omitempty"`
+	CreatedDate      *StringValue `json:"created-date,omitempty"`
+	LastModifiedDate *StringValue `json:"last-modified-date,omitempty"`
+	Path             *string      `json:"path,omitempty"`
+	Visibility       *string      `json:"visibility,omitempty"`
 }
 
 func (c *Client) Biography(orcid string) (*Biography, *http.Response, error) {

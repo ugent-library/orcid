@@ -6,23 +6,23 @@ import (
 )
 
 type ExternalIdentifier struct {
-	CreatedDate  *IntValue `json:"created-date,omitempty"`
-	DisplayIndex *int      `json:"display-index,omitempty"`
+	CreatedDate  *StringValue `json:"created-date,omitempty"`
+	DisplayIndex *int         `json:"display-index,omitempty"`
 	// swagger docs mistakenly say object
-	Relationship     *string      `json:"external-id-relationship,omitempty"`
-	Type             *string      `json:"external-id-type,omitempty"`
-	Value            *string      `json:"external-id-value,omitempty"`
-	URL              *StringValue `json:"external-id-url,omitempty"`
-	LastModifiedDate *IntValue    `json:"last-modified-date,omitempty"`
-	Path             *string      `json:"path,omitempty"`
-	PutCode          *int         `json:"put-code,omitempty"`
-	Source           *Source      `json:"source,omitempty"`
-	Visibility       *string      `json:"visibility,omitempty"`
+	ExternalIdRelationship *string      `json:"external-id-relationship,omitempty"`
+	ExternalIdType         *string      `json:"external-id-type,omitempty"`
+	ExternalIdValue        *string      `json:"external-id-value,omitempty"`
+	ExternalIdUrl          *StringValue `json:"external-id-url,omitempty"`
+	LastModifiedDate       *StringValue `json:"last-modified-date,omitempty"`
+	Path                   *string      `json:"path,omitempty"`
+	PutCode                *int         `json:"put-code,omitempty"`
+	Source                 *Source      `json:"source,omitempty"`
+	Visibility             *string      `json:"visibility,omitempty"`
 }
 
 type ExternalIdentifiers struct {
 	ExternalIdentifier []ExternalIdentifier `json:"external-identifier,omitempty"`
-	LastModifiedDate   *IntValue            `json:"last-modified-date,omitempty"`
+	LastModifiedDate   *StringValue         `json:"last-modified-date,omitempty"`
 	Path               *string              `json:"path,omitempty"`
 }
 

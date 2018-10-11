@@ -11,11 +11,11 @@ type Person struct {
 	Emails              *Emails              `json:"emails,omitempty"`
 	ExternalIdentifiers *ExternalIdentifiers `json:"external-identifiers,omitempty"`
 	Keywords            *Keywords            `json:"keywords,omitempty"`
-	LastModifiedDate    *IntValue            `json:"last-modified-date,omitempty"`
+	LastModifiedDate    *StringValue         `json:"last-modified-date,omitempty"`
 	Name                *Name                `json:"name,omitempty"`
 	OtherNames          *OtherNames          `json:"other-names,omitempty"`
 	Path                *string              `json:"path,omitempty"`
-	ResearcherURLs      *ResearcherURLs      `json:"researcher-urls,omitempty"`
+	ResearcherUrls      *ResearcherUrls      `json:"researcher-urls,omitempty"`
 }
 
 func (c *Client) Person(orcid string) (*Person, *http.Response, error) {

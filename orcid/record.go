@@ -5,16 +5,16 @@ import (
 )
 
 type History struct {
-	Claimed        *bool     `json:"claimed,omitempty"`
-	CompletionDate *IntValue `json:"completion-date,omitempty"`
+	Claimed        *bool        `json:"claimed,omitempty"`
+	CompletionDate *StringValue `json:"completion-date,omitempty"`
 	// TODO define enum
-	CreationMethod       *string   `json:"creation-method,omitempty"`
-	DeactivationDate     *IntValue `json:"deactivation-date,omitempty"`
-	LastModifiedDate     *IntValue `json:"last-modified-date,omitempty"`
-	SubmissionDate       *IntValue `json:"submission-date,omitempty"`
-	Source               *Source   `json:"source,omitempty"`
-	VerifiedEmail        *bool     `json:"verified-email,omitempty"`
-	VerifiedPrimaryEmail *bool     `json:"verified-primary-email,omitempty"`
+	CreationMethod       *string      `json:"creation-method,omitempty"`
+	DeactivationDate     *StringValue `json:"deactivation-date,omitempty"`
+	LastModifiedDate     *StringValue `json:"last-modified-date,omitempty"`
+	SubmissionDate       *StringValue `json:"submission-date,omitempty"`
+	Source               *Source      `json:"source,omitempty"`
+	VerifiedEmail        *bool        `json:"verified-email,omitempty"`
+	VerifiedPrimaryEmail *bool        `json:"verified-primary-email,omitempty"`
 }
 
 type Preferences struct {
@@ -31,6 +31,7 @@ type Record struct {
 	Preferences     *Preferences `json:"preferences,omitempty"`
 }
 
+// TODO set data to nil if error?
 func (c *Client) Record(orcid string) (*Record, *http.Response, error) {
 	data := new(Record)
 	res, err := c.get(orcid, data)

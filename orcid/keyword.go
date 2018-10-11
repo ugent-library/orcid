@@ -6,20 +6,20 @@ import (
 )
 
 type Keyword struct {
-	Content          *string   `json:"content,omitempty"`
-	CreatedDate      *IntValue `json:"created-date,omitempty"`
-	DisplayIndex     *int      `json:"display-index,omitempty"`
-	LastModifiedDate *IntValue `json:"last-modified-date,omitempty"`
-	Path             *string   `json:"path,omitempty"`
-	PutCode          *int      `json:"put-code,omitempty"`
-	Source           *Source   `json:"source,omitempty"`
-	Visibility       *string   `json:"visibility,omitempty"`
+	Content          *string      `json:"content,omitempty"`
+	CreatedDate      *StringValue `json:"created-date,omitempty"`
+	DisplayIndex     *int         `json:"display-index,omitempty"`
+	LastModifiedDate *StringValue `json:"last-modified-date,omitempty"`
+	Path             *string      `json:"path,omitempty"`
+	PutCode          *int         `json:"put-code,omitempty"`
+	Source           *Source      `json:"source,omitempty"`
+	Visibility       *string      `json:"visibility,omitempty"`
 }
 
 type Keywords struct {
-	Keyword          []Keyword `json:"keyword,omitempty"`
-	LastModifiedDate *IntValue `json:"last-modified-date,omitempty"`
-	Path             *string   `json:"path,omitempty"`
+	Keyword          []Keyword    `json:"keyword,omitempty"`
+	LastModifiedDate *StringValue `json:"last-modified-date,omitempty"`
+	Path             *string      `json:"path,omitempty"`
 }
 
 func (c *Client) Keywords(orcid string) (*Keywords, *http.Response, error) {

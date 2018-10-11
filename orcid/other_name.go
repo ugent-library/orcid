@@ -6,20 +6,20 @@ import (
 )
 
 type OtherName struct {
-	Content          *string   `json:"content,omitempty"`
-	CreatedDate      *IntValue `json:"created-date,omitempty"`
-	DisplayIndex     *int      `json:"display-index,omitempty"`
-	LastModifiedDate *IntValue `json:"last-modified-date,omitempty"`
-	Path             *string   `json:"path,omitempty"`
-	PutCode          *int      `json:"put-code,omitempty"`
-	Source           *Source   `json:"path,omitempty"`
-	Visibility       *string   `json:"visibility,omitempty"`
+	Content          *string      `json:"content,omitempty"`
+	CreatedDate      *StringValue `json:"created-date,omitempty"`
+	DisplayIndex     *int         `json:"display-index,omitempty"`
+	LastModifiedDate *StringValue `json:"last-modified-date,omitempty"`
+	Path             *string      `json:"path,omitempty"`
+	PutCode          *int         `json:"put-code,omitempty"`
+	Source           *Source      `json:"path,omitempty"`
+	Visibility       *string      `json:"visibility,omitempty"`
 }
 
 type OtherNames struct {
-	LastModifiedDate *IntValue   `json:"last-modified-date,omitempty"`
-	OtherName        []OtherName `json:"other-name,omitempty"`
-	Path             *string     `json:"path,omitempty"`
+	LastModifiedDate *StringValue `json:"last-modified-date,omitempty"`
+	OtherName        []OtherName  `json:"other-name,omitempty"`
+	Path             *string      `json:"path,omitempty"`
 }
 
 func (c *Client) OtherNames(orcid string) (*OtherNames, *http.Response, error) {

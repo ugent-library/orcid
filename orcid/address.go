@@ -6,8 +6,8 @@ import (
 )
 
 type Address struct {
-	CreatedDate      *IntValue    `json:"created-date,omitempty"`
-	LastModifiedDate *IntValue    `json:"last-modified-date,omitempty"`
+	CreatedDate      *StringValue `json:"created-date,omitempty"`
+	LastModifiedDate *StringValue `json:"last-modified-date,omitempty"`
 	Path             *string      `json:"path,omitempty"`
 	Country          *StringValue `json:"country,omitempty"`
 	Visibility       *string      `json:"visibility,omitempty"`
@@ -16,9 +16,9 @@ type Address struct {
 	Source           *Source      `json:"source,omitempty"`
 }
 type Addresses struct {
-	Address          []Address `json:"address,omitempty"`
-	LastModifiedDate *IntValue `json:"last-modified-date,omitempty"`
-	Path             *string   `json:"path,omitempty"`
+	Address          []Address    `json:"address,omitempty"`
+	LastModifiedDate *StringValue `json:"last-modified-date,omitempty"`
+	Path             *string      `json:"path,omitempty"`
 }
 
 func (c *Client) Addresses(orcid string) (*Addresses, *http.Response, error) {

@@ -6,11 +6,11 @@ import (
 )
 
 type PersonalDetails struct {
-	Biography        *Biography  `json:"biography,omitempty"`
-	LastModifiedDate *IntValue   `json:"last-modified-date,omitempty"`
-	Name             *Name       `json:"name,omitempty"`
-	OtherNames       *OtherNames `json:"other-names,omitempty"`
-	Path             *string     `json:"path,omitempty"`
+	Biography        *Biography   `json:"biography,omitempty"`
+	LastModifiedDate *StringValue `json:"last-modified-date,omitempty"`
+	Name             *Name        `json:"name,omitempty"`
+	OtherNames       *OtherNames  `json:"other-names,omitempty"`
+	Path             *string      `json:"path,omitempty"`
 }
 
 func (c *Client) PersonalDetails(orcid string) (*PersonalDetails, *http.Response, error) {
