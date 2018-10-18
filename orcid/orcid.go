@@ -129,13 +129,17 @@ func (c *Client) Search(q string) (*SearchResults, *http.Response, error) {
 	return data, res, err
 }
 
+var ErrNotFound = errors.New("Not Found")
+
 func (c *Client) get(path string, data interface{}) (*http.Response, error) {
 	req, err := c.newRequest("GET", path, nil)
 	if err != nil {
 		return nil, err
 	}
 	res, err := c.do(req, data)
-	if res.StatusCode != 200 {
+	if res.StatusCode == 404 {
+		err = ErrNotFound
+	} else if res.StatusCode != 200 {
 		err = errors.New(fmt.Sprintf("Couldn't get %s", path))
 	}
 	return res, err
@@ -221,12 +225,9 @@ func (c *Client) do(req *http.Request, data interface{}) (*http.Response, error)
 	return res, err
 }
 
-// common types
-type StringValue struct {
-	Value string `json:"value,omitempty"`
-}
+// TODO don't expose this type
+type StringValue string
 
-// TODO
 func (s *StringValue) UnmarshalJSON(data []byte) error {
 	tmp := struct {
 		Value interface{} `json:"value"`
@@ -236,16 +237,20 @@ func (s *StringValue) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
+	var str string
+
 	switch v := tmp.Value.(type) {
 	case float64:
-		s.Value = strconv.FormatFloat(v, 'E', -1, 64)
+		str = strconv.FormatFloat(v, 'E', -1, 64)
 	case int:
-		s.Value = strconv.FormatInt(int64(v), 10)
+		str = strconv.FormatInt(int64(v), 10)
 	case string:
-		s.Value = v
+		str = v
 	default:
 		return fmt.Errorf("invalid value for Value: %v of Type: %T", v)
 	}
+
+	*s = StringValue(str)
 
 	return nil
 }

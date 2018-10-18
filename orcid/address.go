@@ -6,14 +6,14 @@ import (
 )
 
 type Address struct {
+	Country          *StringValue `json:"country,omitempty"`
 	CreatedDate      *StringValue `json:"created-date,omitempty"`
+	DisplayIndex     *int         `json:"display-index,omitempty"`
 	LastModifiedDate *StringValue `json:"last-modified-date,omitempty"`
 	Path             *string      `json:"path,omitempty"`
-	Country          *StringValue `json:"country,omitempty"`
-	Visibility       *string      `json:"visibility,omitempty"`
 	PutCode          *int         `json:"put-code,omitempty"`
-	DisplayIndex     *int         `json:"display-index,omitempty"`
 	Source           *Source      `json:"source,omitempty"`
+	Visibility       *string      `json:"visibility,omitempty"`
 }
 type Addresses struct {
 	Address          []Address    `json:"address,omitempty"`
