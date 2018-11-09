@@ -120,8 +120,7 @@ type SearchResults struct {
 	} `json:result,omitempty"`
 }
 
-func (c *Client) Search(q string) (*SearchResults, *http.Response, error) {
-	params := url.Values{"q": {q}}
+func (c *Client) Search(params url.Values) (*SearchResults, *http.Response, error) {
 	path := fmt.Sprintf("search?%s", params.Encode())
 	data := new(SearchResults)
 	res, err := c.get(path, data)
