@@ -13,9 +13,8 @@ type ResearcherUrl struct {
 	PutCode          *int         `json:"put-code,omitempty"`
 	Source           *Source      `json:"path,omitempty"`
 	UrlName          *string      `json:"url-name,omitempty"`
-	// swagger docs mistakenly say object
-	Url        *string `json:"url,omitempty"`
-	Visibility *string `json:"visibility,omitempty"`
+	Url              *StringValue `json:"url,omitempty"`
+	Visibility       *string      `json:"visibility,omitempty"`
 }
 
 type ResearcherUrls struct {
