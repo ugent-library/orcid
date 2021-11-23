@@ -5,14 +5,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"golang.org/x/net/context"
-	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/clientcredentials"
 	"io"
 	"net/http"
 	"net/url"
 	"regexp"
 	"strconv"
+
+	"golang.org/x/net/context"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/clientcredentials"
 )
 
 const (
@@ -117,7 +118,7 @@ type SearchResults struct {
 	NumFound int `json:"num-found,omitempty"`
 	Result   []struct {
 		OrcidIdentifier Uri `json:"orcid-identifier,omitempty"`
-	} `json:result,omitempty"`
+	} `json:"result,omitempty"`
 }
 
 func (c *Client) Search(params url.Values) (*SearchResults, *http.Response, error) {
@@ -127,7 +128,7 @@ func (c *Client) Search(params url.Values) (*SearchResults, *http.Response, erro
 	return data, res, err
 }
 
-var ErrNotFound = errors.New("Not Found")
+var ErrNotFound = errors.New("not found")
 
 func (c *Client) get(path string, data interface{}) (*http.Response, error) {
 	req, err := c.newRequest("GET", path, nil)
@@ -138,7 +139,7 @@ func (c *Client) get(path string, data interface{}) (*http.Response, error) {
 	if res.StatusCode == 404 {
 		err = ErrNotFound
 	} else if res.StatusCode != 200 {
-		err = errors.New(fmt.Sprintf("Couldn't get %s", path))
+		err = fmt.Errorf("couldn't get %s", path)
 	}
 	return res, err
 }
@@ -245,7 +246,7 @@ func (s *StringValue) UnmarshalJSON(data []byte) error {
 	case string:
 		str = v
 	default:
-		return fmt.Errorf("invalid value for Value: %v of Type: %T", v)
+		return fmt.Errorf("invalid value for Value: %v of Type: %T", v, v)
 	}
 
 	*s = StringValue(str)
@@ -283,7 +284,7 @@ type Name struct {
 	GivenNames       *StringValue `json:"given-names,omitempty"`
 	LastModifiedDate *StringValue `json:"last-modified-date,omitempty"`
 	Path             *string      `json:"path,omitempty"`
-	Source           *Source      `json:"path,omitempty"`
+	Source           *Source      `json:"source,omitempty"`
 	Visibility       *string      `json:"visibility,omitempty"`
 }
 

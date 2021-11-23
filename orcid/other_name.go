@@ -12,7 +12,7 @@ type OtherName struct {
 	LastModifiedDate *StringValue `json:"last-modified-date,omitempty"`
 	Path             *string      `json:"path,omitempty"`
 	PutCode          *int         `json:"put-code,omitempty"`
-	Source           *Source      `json:"path,omitempty"`
+	Source           *Source      `json:"source,omitempty"`
 	Visibility       *string      `json:"visibility,omitempty"`
 }
 

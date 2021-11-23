@@ -11,7 +11,7 @@ type ResearcherUrl struct {
 	LastModifiedDate *StringValue `json:"last-modified-date,omitempty"`
 	Path             *string      `json:"path,omitempty"`
 	PutCode          *int         `json:"put-code,omitempty"`
-	Source           *Source      `json:"path,omitempty"`
+	Source           *Source      `json:"source,omitempty"`
 	UrlName          *string      `json:"url-name,omitempty"`
 	Url              *StringValue `json:"url,omitempty"`
 	Visibility       *string      `json:"visibility,omitempty"`

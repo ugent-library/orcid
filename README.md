@@ -1,7 +1,7 @@
-orcid-go
+go-orcid
 ========
 
-Package orcid is Go client for the [ORCID](https://orcid.org/) 2.0 API.
+A Go client for the [ORCID](https://orcid.org/) 2.0 API.
 
 Status
 ------
