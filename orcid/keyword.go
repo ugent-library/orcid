@@ -6,41 +6,38 @@ import (
 )
 
 type Keyword struct {
-	Content          *string      `json:"content,omitempty"`
-	CreatedDate      *StringValue `json:"created-date,omitempty"`
-	DisplayIndex     *int         `json:"display-index,omitempty"`
-	LastModifiedDate *StringValue `json:"last-modified-date,omitempty"`
-	Path             *string      `json:"path,omitempty"`
-	PutCode          *int         `json:"put-code,omitempty"`
-	Source           *Source      `json:"source,omitempty"`
-	Visibility       *string      `json:"visibility,omitempty"`
+	Content          string    `json:"content,omitempty"`
+	CreatedDate      TimeValue `json:"created-date,omitempty"`
+	DisplayIndex     int       `json:"display-index,omitempty"`
+	LastModifiedDate TimeValue `json:"last-modified-date,omitempty"`
+	Path             string    `json:"path,omitempty"`
+	PutCode          int       `json:"put-code,omitempty"`
+	Source           *Source   `json:"source,omitempty"`
+	Visibility       string    `json:"visibility,omitempty"`
 }
 
 type Keywords struct {
-	Keyword          []Keyword    `json:"keyword,omitempty"`
-	LastModifiedDate *StringValue `json:"last-modified-date,omitempty"`
-	Path             *string      `json:"path,omitempty"`
+	Keyword          []Keyword `json:"keyword,omitempty"`
+	LastModifiedDate TimeValue `json:"last-modified-date,omitempty"`
+	Path             string    `json:"path,omitempty"`
 }
 
 func (c *Client) Keywords(orcid string) (*Keywords, *http.Response, error) {
-	data := new(Keywords)
+	data := &Keywords{}
 	path := fmt.Sprintf("%s/keywords", orcid)
 	res, err := c.get(path, data)
 	return data, res, err
 }
 
-func (c *MemberClient) AddKeyword(orcid string, bodyData *Keyword) (int, *http.Response, error) {
+func (c *MemberClient) AddKeyword(orcid string, body *Keyword) (int, *http.Response, error) {
 	path := fmt.Sprintf("%s/keywords", orcid)
-	return c.add(path, bodyData)
+	return c.add(path, body)
 }
 
-func (c *MemberClient) UpdateKeyword(orcid string, bodyData *Keyword) (*Keyword, *http.Response, error) {
-	if err := putCodeError(bodyData.PutCode); err != nil {
-		return nil, nil, err
-	}
-	data := new(Keyword)
-	path := fmt.Sprintf("%s/keywords/%d", orcid, *bodyData.PutCode)
-	res, err := c.update(path, bodyData, data)
+func (c *MemberClient) UpdateKeyword(orcid string, body *Keyword) (*Keyword, *http.Response, error) {
+	data := &Keyword{}
+	path := fmt.Sprintf("%s/keywords/%d", orcid, body.PutCode)
+	res, err := c.update(path, body, data)
 	return data, res, err
 }
 

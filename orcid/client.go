@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
 	"regexp"
 	"strconv"
 
@@ -29,28 +28,10 @@ const (
 	SandboxMemberUrl = "https://api.sandbox.orcid.org/v2.0"
 )
 
-// TODO marshalling, String() method
-type Visibility int
-
-const (
-	LIMITED Visibility = iota
-	REGISTERED_ONLY
-	PUBLIC
-	PRIVATE
-)
-
-// TODO marshalling, String() method
-type ExternalIdRelationship int
-
-const (
-	SELF ExternalIdRelationship = iota
-	PART_OF
-)
-
 type Config struct {
 	HTTPClient *http.Client
 
-	ClientId     string
+	ClientID     string
 	ClientSecret string
 	Scopes       []string
 
@@ -85,7 +66,7 @@ func newClient(baseUrl string, cfg Config) *Client {
 			tokenUrl = TokenUrl
 		}
 		oauthCfg := clientcredentials.Config{
-			ClientID:     cfg.ClientId,
+			ClientID:     cfg.ClientID,
 			ClientSecret: cfg.ClientSecret,
 			TokenURL:     tokenUrl,
 			Scopes:       cfg.Scopes,
@@ -114,20 +95,6 @@ func NewMemberClient(cfg Config) *MemberClient {
 	return &MemberClient{newClient(MemberUrl, cfg)}
 }
 
-type SearchResults struct {
-	NumFound int `json:"num-found,omitempty"`
-	Result   []struct {
-		OrcidIdentifier Uri `json:"orcid-identifier,omitempty"`
-	} `json:"result,omitempty"`
-}
-
-func (c *Client) Search(params url.Values) (*SearchResults, *http.Response, error) {
-	path := fmt.Sprintf("search?%s", params.Encode())
-	data := new(SearchResults)
-	res, err := c.get(path, data)
-	return data, res, err
-}
-
 var ErrNotFound = errors.New("not found")
 
 func (c *Client) get(path string, data interface{}) (*http.Response, error) {
@@ -145,8 +112,8 @@ func (c *Client) get(path string, data interface{}) (*http.Response, error) {
 }
 
 //TODO check 201 code
-func (c *MemberClient) add(path string, bodyData interface{}) (int, *http.Response, error) {
-	req, err := c.newRequest("POST", path, bodyData)
+func (c *MemberClient) add(path string, body interface{}) (int, *http.Response, error) {
+	req, err := c.newRequest("POST", path, body)
 	if err != nil {
 		return 0, nil, err
 	}
@@ -165,8 +132,8 @@ func (c *MemberClient) add(path string, bodyData interface{}) (int, *http.Respon
 }
 
 //TODO check 200 code
-func (c *MemberClient) update(path string, bodyData, data interface{}) (*http.Response, error) {
-	req, err := c.newRequest("PUT", path, bodyData)
+func (c *MemberClient) update(path string, body, data interface{}) (*http.Response, error) {
+	req, err := c.newRequest("PUT", path, body)
 	if err != nil {
 		return nil, err
 	}
@@ -194,7 +161,7 @@ func (c *Client) newRequest(method, path string, body interface{}) (*http.Reques
 	u := fmt.Sprintf("%s/%s", c.baseUrl, path)
 	var buf io.ReadWriter
 	if body != nil {
-		buf = new(bytes.Buffer)
+		buf = &bytes.Buffer{}
 		err := json.NewEncoder(buf).Encode(body)
 		if err != nil {
 			return nil, err
@@ -224,83 +191,7 @@ func (c *Client) do(req *http.Request, data interface{}) (*http.Response, error)
 	return res, err
 }
 
-// TODO don't expose this type
-type StringValue string
-
-func (s *StringValue) UnmarshalJSON(data []byte) error {
-	tmp := struct {
-		Value interface{} `json:"value"`
-	}{}
-
-	if err := json.Unmarshal(data, &tmp); err != nil {
-		return err
-	}
-
-	var str string
-
-	switch v := tmp.Value.(type) {
-	case float64:
-		str = strconv.FormatFloat(v, 'E', -1, 64)
-	case int:
-		str = strconv.FormatInt(int64(v), 10)
-	case string:
-		str = v
-	default:
-		return fmt.Errorf("invalid value for Value: %v of Type: %T", v, v)
-	}
-
-	*s = StringValue(str)
-
-	return nil
-}
-
-type Uri struct {
-	Host *string `json:"host,omitempty"`
-	Path *string `json:"path,omitempty"`
-	Uri  *string `json:"uri,omitempty"`
-}
-
-type Source struct {
-	ClientId *Uri         `json:"source-client-id,omitempty"`
-	Name     *StringValue `json:"source-name,omitempty"`
-	Orcid    *Uri         `json:"source-orcid,omitempty"`
-}
-
-type ExternalId struct {
-	Relationship *string      `json:"external-id-relationship,omitempty"`
-	Type         *string      `json:"external-id-type,omitempty"`
-	Url          *StringValue `json:"external-id-url,omitempty"`
-	Value        *string      `json:"external-id-value,omitempty"`
-}
-
-type ExternalIds struct {
-	ExternalId []ExternalId `json:"external-id,omitempty"`
-}
-
-type Name struct {
-	CreatedDate      *StringValue `json:"created-date,omitempty"`
-	CreditName       *StringValue `json:"credit-name,omitempty"`
-	FamilyName       *StringValue `json:"family-name,omitempty"`
-	GivenNames       *StringValue `json:"given-names,omitempty"`
-	LastModifiedDate *StringValue `json:"last-modified-date,omitempty"`
-	Path             *string      `json:"path,omitempty"`
-	Source           *Source      `json:"source,omitempty"`
-	Visibility       *string      `json:"visibility,omitempty"`
-}
-
-func Bool(v bool) *bool       { return &v }
-func String(v string) *string { return &v }
-func Int(v int) *int          { return &v }
-
-func putCodeError(p *int) (err error) {
-	if p == nil {
-		err = errors.New("PutCode is required")
-	}
-	return
-}
-
-// helper functions
-func IsOrcidId(id string) bool {
+func IsOrcid(id string) bool {
 	r := regexp.MustCompile("^[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{4}$")
 	return r.MatchString(id)
 }
