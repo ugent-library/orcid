@@ -23,7 +23,7 @@ type Preferences struct {
 // TODO activities-summary
 type Record struct {
 	History         *History     `json:"history,omitempty"`
-	OrcidIdentifier URI          `json:"orcid-identifier,omitempty"`
+	ORCIDIdentifier URI          `json:"orcid-identifier,omitempty"`
 	Person          *Person      `json:"person,omitempty"`
 	Path            string       `json:"path,omitempty"`
 	Preferences     *Preferences `json:"preferences,omitempty"`

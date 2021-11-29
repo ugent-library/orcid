@@ -191,7 +191,7 @@ func (c *Client) do(req *http.Request, data interface{}) (*http.Response, error)
 	return res, err
 }
 
-func IsOrcid(id string) bool {
+func IsORCID(id string) bool {
 	r := regexp.MustCompile("^[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{4}$")
 	return r.MatchString(id)
 }

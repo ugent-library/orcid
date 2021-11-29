@@ -6,11 +6,13 @@ import (
 	"net/url"
 )
 
+type SearchResult struct {
+	ORCIDIdentifier URI `json:"orcid-identifier,omitempty"`
+}
+
 type SearchResults struct {
-	NumFound int `json:"num-found,omitempty"`
-	Result   []struct {
-		OrcidIdentifier URI `json:"orcid-identifier,omitempty"`
-	} `json:"result,omitempty"`
+	NumFound int            `json:"num-found,omitempty"`
+	Result   []SearchResult `json:"result,omitempty"`
 }
 
 func (c *Client) Search(params url.Values) (*SearchResults, *http.Response, error) {
