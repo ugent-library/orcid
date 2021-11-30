@@ -29,7 +29,10 @@ const (
 	SandboxMemberUrl = "https://api.sandbox.orcid.org/v2.0"
 )
 
-var ErrNotFound = errors.New("not found")
+var (
+	ErrNotFound  = errors.New("not found")
+	ErrDuplicate = errors.New("duplicate")
+)
 
 type Config struct {
 	HTTPClient   *http.Client
@@ -126,6 +129,9 @@ func (c *MemberClient) add(path string, body interface{}) (int, *http.Response, 
 	res, err := c.do(req, nil)
 	if err != nil {
 		return 0, res, err
+	}
+	if res.StatusCode == 409 {
+		return 0, res, ErrDuplicate
 	}
 	if res.StatusCode != 201 {
 		err = fmt.Errorf("couldn't add %s", path)
