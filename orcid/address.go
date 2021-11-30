@@ -6,20 +6,20 @@ import (
 )
 
 type Address struct {
-	Country          StringValue `json:"country,omitempty"`
-	CreatedDate      TimeValue   `json:"created-date,omitempty"`
-	DisplayIndex     int         `json:"display-index,omitempty"`
-	LastModifiedDate TimeValue   `json:"last-modified-date,omitempty"`
-	Path             string      `json:"path,omitempty"`
-	PutCode          int         `json:"put-code,omitempty"`
-	Source           *Source     `json:"source,omitempty"`
-	Visibility       string      `json:"visibility,omitempty"`
+	Country          *StringValue `json:"country,omitempty"`
+	CreatedDate      *TimeValue   `json:"created-date,omitempty"`
+	DisplayIndex     int          `json:"display-index,omitempty"`
+	LastModifiedDate *TimeValue   `json:"last-modified-date,omitempty"`
+	Path             string       `json:"path,omitempty"`
+	PutCode          int          `json:"put-code,omitempty"`
+	Source           *Source      `json:"source,omitempty"`
+	Visibility       string       `json:"visibility,omitempty"`
 }
 
 type Addresses struct {
-	Address          []Address `json:"address,omitempty"`
-	LastModifiedDate TimeValue `json:"last-modified-date,omitempty"`
-	Path             string    `json:"path,omitempty"`
+	Address          []Address  `json:"address,omitempty"`
+	LastModifiedDate *TimeValue `json:"last-modified-date,omitempty"`
+	Path             string     `json:"path,omitempty"`
 }
 
 func (c *Client) Addresses(orcid string) (*Addresses, *http.Response, error) {

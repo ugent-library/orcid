@@ -5,15 +5,15 @@ import (
 )
 
 type History struct {
-	Claimed              bool      `json:"claimed,omitempty"`
-	CompletionDate       TimeValue `json:"completion-date,omitempty"`
-	CreationMethod       string    `json:"creation-method,omitempty"`
-	DeactivationDate     TimeValue `json:"deactivation-date,omitempty"`
-	LastModifiedDate     TimeValue `json:"last-modified-date,omitempty"`
-	SubmissionDate       TimeValue `json:"submission-date,omitempty"`
-	Source               *Source   `json:"source,omitempty"`
-	VerifiedEmail        bool      `json:"verified-email,omitempty"`
-	VerifiedPrimaryEmail bool      `json:"verified-primary-email,omitempty"`
+	Claimed              bool       `json:"claimed,omitempty"`
+	CompletionDate       *TimeValue `json:"completion-date,omitempty"`
+	CreationMethod       string     `json:"creation-method,omitempty"`
+	DeactivationDate     *TimeValue `json:"deactivation-date,omitempty"`
+	LastModifiedDate     *TimeValue `json:"last-modified-date,omitempty"`
+	SubmissionDate       *TimeValue `json:"submission-date,omitempty"`
+	Source               *Source    `json:"source,omitempty"`
+	VerifiedEmail        bool       `json:"verified-email,omitempty"`
+	VerifiedPrimaryEmail bool       `json:"verified-primary-email,omitempty"`
 }
 
 type Preferences struct {
@@ -23,7 +23,7 @@ type Preferences struct {
 // TODO activities-summary
 type Record struct {
 	History         *History     `json:"history,omitempty"`
-	ORCIDIdentifier URI          `json:"orcid-identifier,omitempty"`
+	ORCIDIdentifier *URI         `json:"orcid-identifier,omitempty"`
 	Person          *Person      `json:"person,omitempty"`
 	Path            string       `json:"path,omitempty"`
 	Preferences     *Preferences `json:"preferences,omitempty"`

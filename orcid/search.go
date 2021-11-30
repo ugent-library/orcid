@@ -7,7 +7,7 @@ import (
 )
 
 type SearchResult struct {
-	ORCIDIdentifier URI `json:"orcid-identifier,omitempty"`
+	ORCIDIdentifier *URI `json:"orcid-identifier,omitempty"`
 }
 
 type SearchResults struct {

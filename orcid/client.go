@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -28,21 +29,20 @@ const (
 	SandboxMemberUrl = "https://api.sandbox.orcid.org/v2.0"
 )
 
-type Config struct {
-	HTTPClient *http.Client
+var ErrNotFound = errors.New("not found")
 
+type Config struct {
+	HTTPClient   *http.Client
 	ClientID     string
 	ClientSecret string
 	Scopes       []string
-
-	Token string
-
-	Sandbox bool
+	Token        string
+	Sandbox      bool
 }
 
 type Client struct {
 	httpClient *http.Client
-	baseUrl    string
+	baseURL    string
 }
 
 type MemberClient struct {
@@ -65,11 +65,17 @@ func newClient(baseUrl string, cfg Config) *Client {
 		} else {
 			tokenUrl = TokenUrl
 		}
+
+		scopes := cfg.Scopes
+		if scopes == nil {
+			scopes = []string{"/read-public"}
+		}
+
 		oauthCfg := clientcredentials.Config{
 			ClientID:     cfg.ClientID,
 			ClientSecret: cfg.ClientSecret,
 			TokenURL:     tokenUrl,
-			Scopes:       cfg.Scopes,
+			Scopes:       scopes,
 		}
 
 		httpClient = oauthCfg.Client(context.Background())
@@ -77,7 +83,7 @@ func newClient(baseUrl string, cfg Config) *Client {
 
 	return &Client{
 		httpClient: httpClient,
-		baseUrl:    baseUrl,
+		baseURL:    baseUrl,
 	}
 }
 
@@ -95,14 +101,15 @@ func NewMemberClient(cfg Config) *MemberClient {
 	return &MemberClient{newClient(MemberUrl, cfg)}
 }
 
-var ErrNotFound = errors.New("not found")
-
 func (c *Client) get(path string, data interface{}) (*http.Response, error) {
 	req, err := c.newRequest("GET", path, nil)
 	if err != nil {
 		return nil, err
 	}
 	res, err := c.do(req, data)
+	if err != nil {
+		return res, err
+	}
 	if res.StatusCode == 404 {
 		err = ErrNotFound
 	} else if res.StatusCode != 200 {
@@ -111,7 +118,6 @@ func (c *Client) get(path string, data interface{}) (*http.Response, error) {
 	return res, err
 }
 
-//TODO check 201 code
 func (c *MemberClient) add(path string, body interface{}) (int, *http.Response, error) {
 	req, err := c.newRequest("POST", path, body)
 	if err != nil {
@@ -119,6 +125,10 @@ func (c *MemberClient) add(path string, body interface{}) (int, *http.Response, 
 	}
 	res, err := c.do(req, nil)
 	if err != nil {
+		return 0, res, err
+	}
+	if res.StatusCode != 201 {
+		err = fmt.Errorf("couldn't add %s", path)
 		return 0, res, err
 	}
 	loc, err := res.Location()
@@ -131,7 +141,6 @@ func (c *MemberClient) add(path string, body interface{}) (int, *http.Response, 
 	return putCode, res, err
 }
 
-//TODO check 200 code
 func (c *MemberClient) update(path string, body, data interface{}) (*http.Response, error) {
 	req, err := c.newRequest("PUT", path, body)
 	if err != nil {
@@ -139,6 +148,10 @@ func (c *MemberClient) update(path string, body, data interface{}) (*http.Respon
 	}
 	res, err := c.do(req, data)
 	if err != nil {
+		return res, err
+	}
+	if res.StatusCode != 200 {
+		err = fmt.Errorf("couldn't update %s", path)
 		return res, err
 	}
 	return res, err
@@ -151,6 +164,9 @@ func (c *Client) delete(path string) (bool, *http.Response, error) {
 		return ok, nil, err
 	}
 	res, err := c.do(req, nil)
+	if err != nil {
+		return false, res, err
+	}
 	if res.StatusCode == 204 {
 		ok = true
 	}
@@ -158,7 +174,7 @@ func (c *Client) delete(path string) (bool, *http.Response, error) {
 }
 
 func (c *Client) newRequest(method, path string, body interface{}) (*http.Request, error) {
-	u := fmt.Sprintf("%s/%s", c.baseUrl, path)
+	u := fmt.Sprintf("%s/%s", c.baseURL, path)
 	var buf io.ReadWriter
 	if body != nil {
 		buf = &bytes.Buffer{}
@@ -182,6 +198,7 @@ func (c *Client) newRequest(method, path string, body interface{}) (*http.Reques
 func (c *Client) do(req *http.Request, data interface{}) (*http.Response, error) {
 	res, err := c.httpClient.Do(req)
 	if err != nil {
+		log.Print(err)
 		return nil, err
 	}
 	if data != nil {

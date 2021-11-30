@@ -6,19 +6,19 @@ import (
 )
 
 type ResearcherURL struct {
-	CreatedDate      TimeValue   `json:"created-date,omitempty"`
-	DisplayIndex     int         `json:"display-index,omitempty"`
-	LastModifiedDate TimeValue   `json:"last-modified-date,omitempty"`
-	Path             string      `json:"path,omitempty"`
-	PutCode          int         `json:"put-code,omitempty"`
-	Source           *Source     `json:"source,omitempty"`
-	UrlName          string      `json:"url-name,omitempty"`
-	Url              StringValue `json:"url,omitempty"`
-	Visibility       string      `json:"visibility,omitempty"`
+	CreatedDate      *TimeValue   `json:"created-date,omitempty"`
+	DisplayIndex     int          `json:"display-index,omitempty"`
+	LastModifiedDate *TimeValue   `json:"last-modified-date,omitempty"`
+	Path             string       `json:"path,omitempty"`
+	PutCode          int          `json:"put-code,omitempty"`
+	Source           *Source      `json:"source,omitempty"`
+	UrlName          string       `json:"url-name,omitempty"`
+	Url              *StringValue `json:"url,omitempty"`
+	Visibility       string       `json:"visibility,omitempty"`
 }
 
 type ResearcherURLs struct {
-	LastModifiedDate TimeValue       `json:"last-modified-date,omitempty"`
+	LastModifiedDate *TimeValue      `json:"last-modified-date,omitempty"`
 	Path             string          `json:"path,omitempty"`
 	ResearcherURL    []ResearcherURL `json:"researcher-url,omitempty"`
 }
