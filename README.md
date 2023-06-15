@@ -1,5 +1,5 @@
-go-orcid
-========
+orcid
+=====
 
 A Go client for the [ORCID](https://orcid.org/) 2.0 API.
 

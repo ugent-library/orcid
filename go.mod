@@ -1,4 +1,4 @@
-module github.com/ugent-library/go-orcid
+module github.com/ugent-library/orcid
 
 go 1.16
 
