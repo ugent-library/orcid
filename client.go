@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
+	"io/ioutil"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -204,12 +204,16 @@ func (c *Client) newRequest(method, path string, body interface{}) (*http.Reques
 func (c *Client) do(req *http.Request, data interface{}) (*http.Response, error) {
 	res, err := c.httpClient.Do(req)
 	if err != nil {
-		log.Print(err)
 		return nil, err
 	}
 	if data != nil {
-		defer res.Body.Close()
-		err = json.NewDecoder(res.Body).Decode(data)
+		b, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			return nil, fmt.Errorf("cannot read orcid response: %s", err)
+		}
+		if err = json.Unmarshal(b, data); err != nil {
+			return nil, fmt.Errorf("cannot decode orcid response: %s [response: %s]", err, b)
+		}
 	}
 	return res, err
 }
