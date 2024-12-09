@@ -8,7 +8,7 @@ type StringValue struct {
 
 type TimeValue struct {
 	// Value time.Time `json:"value,omitempty"`
-	Value int64 `json:"value,omitempty"`
+	Value time.Time `json:"-"`
 }
 
 func String(v string) *StringValue {
@@ -16,5 +16,5 @@ func String(v string) *StringValue {
 }
 
 func Time(v time.Time) *TimeValue {
-	return &TimeValue{}
+	return &TimeValue{Value: v}
 }
